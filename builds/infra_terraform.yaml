@@ -15,6 +15,7 @@
 timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
+  _CREATE_REGISTRY: "false"
 tags:
   - infra-main-terraform
 steps:
@@ -36,6 +37,7 @@ steps:
     args:
       - -c
       - |
+        [[ "${_CREATE_REGISTRY}" == "false" ]] && exit 0
         exec gcloud builds submit --config builds/infra-create-artifact-repo.yaml
   # 2 Build images
   - name: "gcr.io/cloud-builders/gcloud"

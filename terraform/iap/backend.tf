@@ -2,6 +2,6 @@
 
 terraform {
  backend "gcs" {
-   prefix  = "tfstate/vpc"
+   prefix  = "tfstate/services"
  }
 }
