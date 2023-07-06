@@ -1,0 +1,47 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+timeout: 14400s # 2hr
+substitutions:
+  _PROJECT_ID: ${PROJECT_ID}
+tags:
+  - infra-main-terraform
+steps:
+  # 0 Build GCS storage bucket for TF state, project files, vars.sh etc
+  # This step creates a GCS storage bucket in the project with the name of project ID.
+  # This step creates the following resources:
+  #   1. GCS storage bucket (with versioning enabled) named PROJECT_ID.
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "00-infra-create-gcs"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        exec gcloud builds submit --config builds/infra-create-gcs.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+  # 1 Create image repo
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "01-create-artifact-registry-repo"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        exec gcloud builds submit --config builds/infra-create-artifact-repo.yaml
+  # 2 Build images
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "02-build-and-push-images"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        exec gcloud builds submit --config builds/infra-build-images.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
