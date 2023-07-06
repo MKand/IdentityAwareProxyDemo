@@ -1,8 +1,15 @@
-variable "custom_domain" {
-  description = "Custom domain for the Load Balancer."
+variable "custom_domain_1" {
+  description = "Custom domain for the Load Balancer 1"
   type        = string
   default     = null
 }
+
+variable "custom_domain_2" {
+  description = "Custom domain for the Load Balancer 2"
+  type        = string
+  default     = null
+}
+
 
 variable "iap" {
   description = "Identity-Aware Proxy for Cloud Run in the LB."
