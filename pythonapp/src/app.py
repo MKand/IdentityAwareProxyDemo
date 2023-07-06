@@ -16,6 +16,8 @@ import platform
 
 import flask
 
+import requests
+
 import validate_jwt
 
 import os
@@ -23,7 +25,7 @@ import os
 CLOUD_PROJECT_ID = os.getenv("PROJECT_ID", "abc")
 BACKEND_SERVICE_ID = os.getenv("BACKEND_SERVICE_ID", "abc")
 SERVICE_HOST = os.getenv("SERVICE_HOST", "UNKNOWN")
-PROXY_HOST = os.getenv("PROXY_HOST", "localhost:5000")
+PROXY_HOST = os.getenv("PROXY_HOST", "http://localhost:5000")
 app = flask.Flask(__name__)
 
 
@@ -49,14 +51,14 @@ def root():
     else:
         return f"Hi, {user_email}. I am {platform.node()}."
 
-@app.route("/proxyhello") 
-#TODO implement proxying
+@app.route("/helloproxy") 
 def helloproxy():
-    return "hello back from " + SERVICE_HOST + " " + platform.node() + "\n"
+    r = requests.get(url = f"{PROXY_HOST}/hello")
+    return f"Proxied response: {r.text}  \n"
 
 @app.route("/hello") 
 def hello():
-    return "hello back from " + SERVICE_HOST  + " " + platform.node() + "\n"
+    return f"hello back from {SERVICE_HOST} {platform.node()} \n"
 
 if __name__ == "__main__":
     app.run(debug=True)
