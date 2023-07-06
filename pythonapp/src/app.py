@@ -29,36 +29,41 @@ PROXY_HOST = os.getenv("PROXY_HOST", "http://localhost:5000")
 app = flask.Flask(__name__)
 
 
-
-
-@app.route("/")
+@app.route("/") 
 def root():
     jwt = flask.request.headers.get("x-goog-iap-jwt-assertion")
 
-    app.logger.info("JWT:", jwt)
+    _, user_email, error_str = check_auth(jwt)
+    
+    if error_str:
+        return f"Error: {error_str}"
+    return f"hello {user_email} from {SERVICE_HOST} {platform.node()} \n"
 
+@app.route("/proxy") 
+def helloproxy():
+    jwt = flask.request.headers.get("x-goog-iap-jwt-assertion")
+
+    _, user_email, error_str = check_auth(jwt)
+
+    if error_str:
+        return f"Error: {error_str}"
+    
+    r = requests.get(url = PROXY_HOST)
+    return f"Proxied response for {user_email} : {r.text}  \n"
+
+
+def check_auth(jwt):
     if jwt is None:
         return "Unauthorized request.", 401
+    
     expected_audience = (
         f"/projects/{CLOUD_PROJECT_ID}/global/backendServices/{BACKEND_SERVICE_ID}"
     )
 
-    user_id, user_email, error_str = validate_jwt.validate_iap_jwt(
+    return validate_jwt.validate_iap_jwt(
         jwt, expected_audience
     )
-    if error_str:
-        return f"Error: {error_str}"
-    else:
-        return f"Hi, {user_email}. I am {platform.node()}."
-
-@app.route("/helloproxy") 
-def helloproxy():
-    r = requests.get(url = f"{PROXY_HOST}/hello")
-    return f"Proxied response: {r.text}  \n"
-
-@app.route("/hello") 
-def hello():
-    return f"hello back from {SERVICE_HOST} {platform.node()} \n"
+    
 
 if __name__ == "__main__":
     app.run(debug=True)
