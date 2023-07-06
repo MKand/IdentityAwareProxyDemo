@@ -5,3 +5,8 @@ tfplan
 .theia
 */.terraform/
 *.tfstate*
+
+docker-compose.yaml
+keys/
+
+__pycache__

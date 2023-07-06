@@ -25,9 +25,10 @@ module "cloud_run_1" {
       env = {
         PROJECT_NUMBER = data.google_project.project.number
         BACKEND_SERVICE_ID = data.google_compute_backend_service.service_1.generated_id
-        PROXY_HOST = "https://ping.manasakandula.tech"
-        RANDOM_ID = timestamp() # used to force a recreate at every run
+        RELAY_HOST = "https://ping.manasakandula.tech"
         SERVICE_HOST = local.service_name_1
+        CLIENT_ID = google_iap_client.iap_client_1.client_id
+        RANDOM_ID = timestamp() # used to force a recreate at every run
 
       }
 }
@@ -55,9 +56,10 @@ module "cloud_run_2" {
       env = {
         PROJECT_NUMBER = data.google_project.project.number
         BACKEND_SERVICE_ID = data.google_compute_backend_service.service_2.generated_id
-        PROXY_HOST ="https://pong.manasakandula.tech"
-        RANDOM_ID = timestamp() # used to force a recreate at every run
+        RELAY_HOST ="https://pong.manasakandula.tech"
         SERVICE_HOST = local.service_name_2
+        CLIENT_ID = google_iap_client.iap_client_2.client_id
+        RANDOM_ID = timestamp() # used to force a recreate cloudrun at every run
       }
 }
   }
@@ -205,6 +207,7 @@ resource "google_iap_web_iam_member" "iap_iam" {
   role    = "roles/iap.httpsResourceAccessor"
   member  = "user:${var.iap.email}"
 }
+
 
 # SA service agent for IAP, which invokes CR
 # Note:
