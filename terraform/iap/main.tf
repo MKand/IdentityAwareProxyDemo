@@ -8,6 +8,18 @@ locals {
     service_name_1 = "ping"
     service_name_2 = "pong"
 }
+resource "google_service_account" "sa_1" {
+  account_id   = "service-account-service-1"
+  project = var.project_id
+  display_name = "Service Account"
+}
+
+resource "google_service_account" "sa_2" {
+  account_id   = "service-account-service-2"
+    project = var.project_id
+
+  display_name = "Service Account"
+}
 
 module "cloud_run_1" {
   source     = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/cloud-run?depth=2"
@@ -38,6 +50,7 @@ module "cloud_run_1" {
   }
   ingress_settings = var.ingress_settings
   depends_on = [ module.glb_1 ]
+  service_account = google_service_account.sa_1.email
 }
 
 module "cloud_run_2" {
@@ -67,6 +80,7 @@ module "cloud_run_2" {
     "roles/run.invoker" = ["serviceAccount:${google_project_service_identity.iap_sa.email}"]
   }
   ingress_settings = var.ingress_settings
+  service_account = google_service_account.sa_2.email
   depends_on = [ module.glb_2 ]
 }
 
@@ -202,11 +216,24 @@ resource "google_iap_client" "iap_client_2" {
 
 # IAM policy for IAP
 # For simplicity we use the same email as support_email and authorized member
-resource "google_iap_web_iam_member" "iap_iam" {
+resource "google_iap_web_iam_member" "iap_sa" {
   project = var.project_id
   role    = "roles/iap.httpsResourceAccessor"
   member  = "user:${var.iap.email}"
 }
+
+resource "google_iap_web_iam_member" "iap_sa_1" {
+  project = var.project_id
+  role    = "roles/iap.httpsResourceAccessor"
+  member  = "serviceAccount:${google_service_account.sa_1.email}"
+}
+
+resource "google_iap_web_iam_member" "iap_sa_2" {
+  project = var.project_id
+  role    = "roles/iap.httpsResourceAccessor"
+  member  = "serviceAccount:${google_service_account.sa_2.email}"
+}
+
 
 
 # SA service agent for IAP, which invokes CR
