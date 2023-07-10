@@ -29,14 +29,7 @@ def root():
         return f"Error: {error_str}"
     return f"hello {user_email} from {SERVICE_HOST} \n"
 
-@app.route("/noauth") 
-def hello_proxy_noauth():
-    open_id_connect_token = id_token.fetch_id_token(Request(), CLIENT_ID)
-    headers={"Authorization": "Bearer {}".format(open_id_connect_token)}
-    r = requests.get(url = RELAY_HOST, headers=headers)
-    return f"Proxied response for: {r.text}  \n"
-
-@app.route("/relay_indirect") 
+@app.route("/relay") 
 def relay_indirect():
     jwt = flask.request.headers.get("x-goog-iap-jwt-assertion")
     _, user_email, error_str = check_auth(jwt)
@@ -45,17 +38,9 @@ def relay_indirect():
     open_id_connect_token = id_token.fetch_id_token(Request(), CLIENT_ID)
     headers={"Authorization": "Bearer {}".format(open_id_connect_token)}
     r = requests.get(url = RELAY_HOST, headers=headers)
-    return f"Indirect relay response for {user_email} : {r.text}  \n"
+    return f"Relay response for {user_email} \n {r.text}  \n"
 
-@app.route("/relay_direct") 
-def relay_direct():
-    jwt = flask.request.headers.get("x-goog-iap-jwt-assertion")
-    _, user_email, error_str = check_auth(jwt)
-    if error_str:
-        return f"Error: {error_str}"
-    headers={"Authorization": "Bearer {}".format(jwt)}
-    r = requests.get(url = RELAY_HOST, headers=headers)
-    return f"Direct relay response for {user_email} : {r.text}  \n"
+
 
 def check_auth(jwt):
     if jwt is None:
