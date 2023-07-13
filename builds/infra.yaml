@@ -59,4 +59,4 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/infra-deploy-terraform.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_LOCATION=${_LOCATION},_URL_1=${_URL_1},_URL_2=${_URL_2},_EMAIL=${_EMAIL} 
+         exec gcloud builds submit --config builds/infra-deploy-terraform.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_LOCATION=${_LOCATION},_URL_1=${_URL_1},_URL_2=${_URL_2},_EMAIL=${_EMAIL} 

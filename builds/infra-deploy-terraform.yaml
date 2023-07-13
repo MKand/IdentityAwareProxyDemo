@@ -24,12 +24,12 @@ substitutions:
 
 steps:
 - name: "hashicorp/terraform:1.4.6"
-    id: "deploy-infra"
-    entrypoint: "sh"
-    dir: "terraform/iap"
-    args:
-      - "-xe"
-      - "-c"
-      - |
-        terraform init -backend-config="bucket=${_PROJECT_ID}"
-        terraform apply -var="project_id=${_PROJECT_ID}" -var="region=${_LOCATION}" -var="custom_domain_1=${_URL_1}" -var="custom_domain_2=${_URL_2}" -var="email=${_EMAIL}" -var="image=${_LOCATION}-docker.pkg.dev/${_PROJECT_ID}/iapdemo/helloapp" --auto-approve
+  id: "deploy-infra"
+  entrypoint: "sh"
+  dir: "terraform/iap"
+  args:
+    - "-xe"
+    - "-c"
+    - |
+      terraform init -backend-config="bucket=${_PROJECT_ID}"
+      terraform apply -var="project_id=${_PROJECT_ID}" -var="region=${_LOCATION}" -var="custom_domain_1=${_URL_1}" -var="custom_domain_2=${_URL_2}" -var="email=${_EMAIL}" -var="image=${_LOCATION}-docker.pkg.dev/${_PROJECT_ID}/iapdemo/helloapp" --auto-approve

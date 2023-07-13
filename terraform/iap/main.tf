@@ -190,6 +190,8 @@ module "glb_2" {
 # underlying Google API doesn't support DELETE or PATCH methods.
 # Destroying a Terraform-managed Brand will remove it from state but
 # will not delete it from Google Cloud.
+
+## Comment this out if there is an iap brand resource already deployed
 # resource "google_iap_brand" "iap_brand" {
 #   project = data.google_project.project.number
 #   support_email     = var.email
@@ -219,7 +221,7 @@ resource "google_iap_client" "iap_client_2" {
 resource "google_iap_web_iam_member" "iap_sa" {
   project = var.project_id
   role    = "roles/iap.httpsResourceAccessor"
-  member  = "user:${var.iap.email}"
+  member  = "user:${var.email}"
 }
 
 resource "google_iap_web_iam_member" "iap_sa_1" {

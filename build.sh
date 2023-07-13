@@ -18,3 +18,4 @@ echo -e "\e[95mStarting Cloudbuild to create infrastructure using ${BUILD}...\e[
 #[[ "${DESTROY}" == "true" ]] && gcloud builds submit --config=builds/infra_terraform_destroy.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
 
 echo -e "\e[95mYou can view the Cloudbuild status through https://console.cloud.google.com/cloud-build\e[0m"
+echo -e "\e[95mUse the loadbalancer IPs from the terraform output  to update the DNS records of the URLs of the two services"

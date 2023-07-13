@@ -22,7 +22,7 @@ variable "iap" {
 }
 
 variable "email" {
-  type = optional(string)
+  type = string
   description = "User email to give IaP access to"
 }
 
