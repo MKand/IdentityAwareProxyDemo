@@ -21,26 +21,26 @@ app = flask.Flask(__name__)
 
 @app.route("/") 
 def root():
+    # Check if caller is authenticated
     jwt = flask.request.headers.get("x-goog-iap-jwt-assertion")
-
     _, user_email, error_str = check_auth(jwt)
-    
     if error_str:
         return f"Error: {error_str}"
     return f"hello {user_email} from {SERVICE_HOST} \n"
 
+# Relays the message to the other service and prints out response
 @app.route("/relay") 
 def relay_indirect():
     jwt = flask.request.headers.get("x-goog-iap-jwt-assertion")
     _, user_email, error_str = check_auth(jwt)
     if error_str:
         return f"Error: {error_str}"
+    
+    # Get access token using application's service account
     open_id_connect_token = id_token.fetch_id_token(Request(), CLIENT_ID)
     headers={"Authorization": "Bearer {}".format(open_id_connect_token)}
     r = requests.get(url = RELAY_HOST, headers=headers)
-    return f"Relay response for {user_email} \n {r.text}  \n"
-
-
+    return flask.render_template('relay.html', user_email=user_email, text=r.text)
 
 def check_auth(jwt):
     if jwt is None:
