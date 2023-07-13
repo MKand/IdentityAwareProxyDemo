@@ -1,3 +1,7 @@
+#Set environment variables
+echo -e "\e[95mSetting required environment variables"
+source ./set_env_vars.sh
+
 # Enable Cloudbuild API
 echo -e "\e[95mEnabling required APIs in ${PROJECT_ID}\e[0m"
 gcloud services enable cloudresourcemanager.googleapis.com cloudbuild.googleapis.com storage.googleapis.com artifactregistry.googleapis.com beyondcorp.googleapis.com cloudapis.googleapis.com compute.googleapis.com iap.googleapis.com run.googleapis.com iam.googleapis.com
@@ -10,7 +14,7 @@ gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:${P
 
 # Start main build
 echo -e "\e[95mStarting Cloudbuild to create infrastructure using ${BUILD}...\e[0m"
-[[ "${DESTROY}" != "true" ]] && gcloud builds submit --config=builds/infra_terraform.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
+[[ "${DESTROY}" != "true" ]] && gcloud builds submit --config=builds/infra.yaml --substitutions=_PROJECT_ID=${PROJECT_ID},_LOCATION=${LOCATION},_URL_1=${URL_1},_URL_2=${URL_2},_EMAIL=${EMAIL}  --async
 #[[ "${DESTROY}" == "true" ]] && gcloud builds submit --config=builds/infra_terraform_destroy.yaml --substitutions=_PROJECT_ID=${PROJECT_ID} --async
 
 echo -e "\e[95mYou can view the Cloudbuild status through https://console.cloud.google.com/cloud-build\e[0m"

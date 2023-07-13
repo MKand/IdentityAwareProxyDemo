@@ -21,6 +21,11 @@ variable "iap" {
   default = {}
 }
 
+variable "email" {
+  type = optional(string)
+  description = "User email to give IaP access to"
+}
+
 variable "image" {
   description = "Container image to deploy."
   type        = string

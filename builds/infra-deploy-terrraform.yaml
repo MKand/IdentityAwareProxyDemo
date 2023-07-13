@@ -14,11 +14,22 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-build-images
+  - infra-deploy-terraform
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _LOCATION : ${LOCATION}
+  _URL_1 : ${URL_1}
+  _URL_2 : ${URL_2}
+  _EMAIL: ${EMAIL}
+
 steps:
-- name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', '${_LOCATION}-docker.pkg.dev/${_PROJECT_ID}/iapdemo/helloapp', './pythonapp' ]
-images: ['${_LOCATION}-docker.pkg.dev/${_PROJECT_ID}/iapdemo/helloapp']
+- name: "hashicorp/terraform:1.4.6"
+    id: "deploy-infra"
+    entrypoint: "sh"
+    dir: "terraform/iap"
+    args:
+      - "-xe"
+      - "-c"
+      - |
+        terraform init -backend-config="bucket=${_PROJECT_ID}"
+        terraform apply -var="project_id=${_PROJECT_ID}" -var="region=${_LOCATION}" -var="custom_domain_1=${_URL_1}" -var="custom_domain_2=${_URL_2}" -var="email=${_EMAIL}" -var="image=${_LOCATION}-docker.pkg.dev/${_PROJECT_ID}/iapdemo/helloapp" --auto-approve

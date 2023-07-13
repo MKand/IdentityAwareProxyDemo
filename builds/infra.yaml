@@ -16,6 +16,11 @@ timeout: 14400s # 2hr
 substitutions:
   _PROJECT_ID: ${PROJECT_ID}
   _CREATE_REGISTRY: "false"
+  _URL_1: ${URL_1}
+  _URL_2: ${URL_2}
+  _LOCATION: ${LOCATION}
+  _EMAIL: ${EMAIL}
+
 tags:
   - infra-main-terraform
 steps:
@@ -38,7 +43,7 @@ steps:
       - -c
       - |
         [[ "${_CREATE_REGISTRY}" == "false" ]] && exit 0
-        exec gcloud builds submit --config builds/infra-create-artifact-repo.yaml
+        exec gcloud builds submit --config builds/infra-create-artifact-repo.yaml --substitutions=_LOCATION=${_LOCATION}
   # 2 Build images
   - name: "gcr.io/cloud-builders/gcloud"
     id: "02-build-and-push-images"
@@ -46,4 +51,12 @@ steps:
     args:
       - -c
       - |
-        exec gcloud builds submit --config builds/infra-build-images.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID}
+        exec gcloud builds submit --config builds/infra-build-images.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_LOCATION=${_LOCATION}
+  # 3 Deploy Infra with terraform
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "03-deploy-terraform"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        exec gcloud builds submit --config builds/infra-deploy-terraform.yaml --substitutions=_PROJECT_ID=${_PROJECT_ID},_LOCATION=${_LOCATION},_URL_1=${_URL_1},_URL_2=${_URL_2},_EMAIL=${_EMAIL} 

@@ -192,7 +192,7 @@ module "glb_2" {
 # will not delete it from Google Cloud.
 # resource "google_iap_brand" "iap_brand" {
 #   project = data.google_project.project.number
-#   support_email     = "admin@manasakandula.altostrat.com"# var.iap.email
+#   support_email     = var.email
 #   application_title = var.iap.app_title
 
 # }

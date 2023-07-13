@@ -14,7 +14,9 @@
 
 timeout: 7200s # 2hr
 tags:
-  - infra-build-images
+  - infra-create-artifact-repo
+substitutions:
+  _LOCATION: ${LOCATION}
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'
   id: "infra-create-artifact-repo"
@@ -22,4 +24,4 @@ steps:
   args:
     - -c
     - |
-       gcloud artifacts repositories create iapdemo --location=us-central1 --repository-format=docker
+       gcloud artifacts repositories create iapdemo --location=${_LOCATION} --repository-format=docker
